@@ -13,17 +13,12 @@ namespace ApplicationPrototype.Controllers
     public class AuditController : ApiController
     {
         DocRepository Repository = new DocRepository();
-        // GET: api/Audit
-        public async Task<Audit> GetAudit()
-        {
-            Audit audit;
-            using (var client = new HttpClient())
-            {
 
-                var response = await client.GetStringAsync("http://www.mocky.io/v2/5bbe0ac43100003800711390");
-                audit = JsonConvert.DeserializeObject<Audit>(response);
-            }
-            return audit;
+        // GET: api/Audit
+        public async Task<List<Audit>> GetAudits()
+        {
+            List<Audit> audits = await Repository.GetAudits();
+            return audits;
         }
 
         // GET: api/Audit/GetModify
@@ -31,27 +26,6 @@ namespace ApplicationPrototype.Controllers
         {
             Audit audit = Repository.GetDataFromDoc();
             return audit;
-        }
-
-        // GET: api/Audit/5
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST: api/Audit
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT: api/Audit/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE: api/Audit/5
-        public void Delete(int id)
-        {
         }
     }
 }
