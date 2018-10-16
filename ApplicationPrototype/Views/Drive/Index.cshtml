@@ -1,0 +1,75 @@
+﻿@model IEnumerable<ApplicationPrototype.Models.GoogleDriveFiles>
+@{
+    ViewBag.Title = "Google Drive Documents";
+}
+<div class="container">
+    <h2 style="text-align:center">GOOGLE DIRVE FILES</h2>
+    @using (Html.BeginForm("UploadFile", "Drive", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <label for="file">Upload file:</label>
+        <div class="row">
+            <input type="file" accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" name="file" id="file" class="form-control" />
+            <br />
+            <input type="submit" value="↑ Upload File to Google Drive ↑" class="btn btn-success" />
+        </div>
+    }
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table" border="1">
+                <tr id="header" style="text-align:center">
+                    <th>
+                        File
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        Download
+                    </th>
+                    <th>
+                        Delete
+                    </th>
+                    <th>
+                        Open
+                    </th>
+                </tr>
+
+                @if (Model.Count() > 0)
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr id="layouttable">
+                            <td><img src="@item.IconLink" alt="Icon" /></td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td style="text-align:center">
+                                <a href="/Drive/DownloadFile/@item.Id" class="btn btn-sm btn-default">Download</a>
+                            </td>
+                            <td style="text-align:center">
+                                <a href="/Drive/DeleteFile/@item.Id" class="btn btn-sm btn-danger">Delete</a>
+
+                                @*@using (Html.BeginForm("DeleteFile", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                                {
+                                    <input type="hidden" name=Id value="@item.Id">
+                                    <input type="submit" class="DeleteFile btn btn-sm btn-danger" value="Delete" style="align-content:center" />
+                                }*@
+
+                            </td>
+                            <td style="text-align:center">
+                                <a href="@item.WebViewLink" target="_blank" class="btn btn-sm btn-info">Open Document</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6">No files found</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+</div>

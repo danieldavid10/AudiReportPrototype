@@ -23,7 +23,7 @@ namespace ApplicationPrototype.Controllers
         {
             Audit audit = driveRepository.FindById(id);
             string documentName = docRepository.GenerateDocument(audit);
-            driveRepository.UploadFile(documentName);
+            //driveRepository.UploadFile(documentName);
             return RedirectToAction("Index");
         }
     }

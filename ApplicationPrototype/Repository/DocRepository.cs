@@ -13,7 +13,7 @@ namespace ApplicationPrototype.Models
 {
     public class DocRepository
     {
-        string pathFiles = HttpContext.Current.Server.MapPath("~/Files/");
+        string pathFiles = @"D:\WDocuments\";
 
         public async Task<List<Audit>> GetAudits()
         {
@@ -51,7 +51,7 @@ namespace ApplicationPrototype.Models
             string path = pathFiles + audit.Title + ".docx";
             document.SaveToFile(path, FileFormat.Docx2013);
             // Open Document
-            //Process.Start(path);
+            Process.Start(path);
 
             return audit.Title;
         }

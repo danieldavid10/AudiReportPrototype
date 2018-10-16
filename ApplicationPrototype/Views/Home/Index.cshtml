@@ -3,39 +3,41 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Audi Reports Prototype</h2>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Titulo de la Auditoria
-            </th>
-            <th>
-                Subir a Google Drive
-            </th>
-            <th>
-                Editar en Google Doc
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model.Count() > 0)
-        {
-            foreach (var item in Model)
+<h2 style="text-align:center">List of Reports</h2>
+<br />
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Title
+                </th>
+                <th>
+                    Mapping in word document
+                </th>
+                <th>
+                    Edit in Google Doc
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Count() > 0)
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td><button class="btn btn-sm btn-success">Subir</button></td>
+                        <td><a href="/Home/EditDocumentInGoogleDocs/@item.AuditId" class="btn btn-sm btn-primary">Editar</a></td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-                    <td>@item.Title</td>
-                    <td><button class="btn btn-sm btn-success">Subir</button></td>
-                    <td><a href="/Home/EditDocumentInGoogleDocs/@item.AuditId" class="btn btn-sm btn-primary">Editar</a></td>
+                    <td>No existen Auditorias..!!!</td>
                 </tr>
             }
-        }
-        else
-        {
-            <tr>
-                <td>No existen Auditorias..!!!</td>
-            </tr>
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>

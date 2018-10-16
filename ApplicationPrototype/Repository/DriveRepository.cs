@@ -1,4 +1,5 @@
 ﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
@@ -17,13 +18,13 @@ namespace ApplicationPrototype.Models
     public class DriveRepository
     {
         // Folder of Files
-        string pathFiles = HttpContext.Current.Server.MapPath("~/Files/");
+        string pathFiles = @"D:\WDocuments\";
         // Defined scope.
-        public static string[] Scopes = { DriveService.Scope.Drive };
+        public static string[] Scopes = new string[] { DriveService.Scope.Drive, DriveService.Scope.DriveFile };
 
         public static DriveService GetService()
         {
-            //get Credentials from client_secret.json file 
+            // Get Credentials from client_secret.json file 
             UserCredential credential;
             string path = HttpContext.Current.Server.MapPath("~/Credentials");
             using (var stream = new FileStream(path + "/client_secret.json", FileMode.Open, FileAccess.Read))
@@ -75,24 +76,170 @@ namespace ApplicationPrototype.Models
         {
             DriveService service = GetService();
 
-            var fileMetadata = new Google.Apis.Drive.v3.Data.File()
-            {
-                Name = name
-                //MimeType = "application/vnd.google-apps.document"
-            };
-            FilesResource.CreateMediaUpload request;
+            //string path = Path.Combine(HttpContext.Current.Server.MapPath("~/Files"),
+            //    Path.GetFileName(name + ".docx"));
+
             string path = pathFiles + name + ".docx";
-            using (var stream = new System.IO.FileStream(@"D:\Info-Arch Projects\Audi-Reports Prototype\AudiReportPrototype\ApplicationPrototype\Files\"+name+".docx", System.IO.FileMode.Open))
+
+            if (System.IO.File.Exists(path))
             {
-                request = service.Files.Create(
-                    fileMetadata, stream, "application/vnd.google-apps.document");
-                request.Fields = "id";
-                request.Upload();
+                var fileMetadata = new Google.Apis.Drive.v3.Data.File()
+                {
+                    Name = "Damiel David",
+                    MimeType = "application/vnd.google-apps.document"
+                };
+
+                FilesResource.CreateMediaUpload request;
+
+                using (var stream = new System.IO.FileStream(path, System.IO.FileMode.Open))
+                {
+                    request = service.Files.Create(fileMetadata, stream, fileMetadata.MimeType);
+                    request.Fields = "id";
+                    request.Upload();
+                }
+                var file = request.ResponseBody;
+                Console.WriteLine("File ID: " + file.Id);
             }
-            var file = request.ResponseBody;
-            Console.WriteLine("File ID: " + file.Id);
         }
 
+        public List<GoogleDriveFiles> getFilesInFolder()
+        {
+            DriveService service = GetService();
 
+            // define parameters of request.
+            FilesResource.ListRequest FileListRequest = service.Files.List();
+
+            //listRequest.PageSize = 10;
+            //listRequest.PageToken = 10;
+            FileListRequest.Fields = "nextPageToken, files(id, name, size, version, createdTime, webViewLink, iconLink)";
+            FileListRequest.Q = "'1RKjoybSiXZlSMlE-vINZ-y2rd9QNU9A4' in parents"; // Files in folder id
+
+            //get file list.
+            IList<Google.Apis.Drive.v3.Data.File> files = FileListRequest.Execute().Files;
+            List<GoogleDriveFiles> FileList = new List<GoogleDriveFiles>();
+
+            if (files != null && files.Count > 0)
+            {
+                foreach (var file in files)
+                {
+                    GoogleDriveFiles File = new GoogleDriveFiles
+                    {
+                        Id = file.Id,
+                        Name = file.Name,
+                        Size = file.Size,
+                        WebViewLink = file.WebViewLink,
+                        IconLink = file.IconLink
+                    };
+                    FileList.Add(File);
+                }
+            }
+            return FileList;
+        }
+
+        public void FileUpload(HttpPostedFileBase file)
+        {
+            if (file != null && file.ContentLength > 0)
+            {
+                DriveService service = GetService();
+
+                string folderID = "1RKjoybSiXZlSMlE-vINZ-y2rd9QNU9A4";
+
+                string path = Path.Combine(HttpContext.Current.Server.MapPath("~/GoogleDriveFiles"),
+                Path.GetFileName(file.FileName));
+                file.SaveAs(path);
+
+                var FileMetaData = new Google.Apis.Drive.v3.Data.File();
+                FileMetaData.Name = Path.GetFileName(file.FileName);
+                //FileMetaData.MimeType = MimeMapping.GetMimeMapping(path); // Uploading any file
+                FileMetaData.MimeType = "application/vnd.google-apps.document"; // Upload as Google Document
+                FileMetaData.Parents = new List<string> { folderID };
+
+                FilesResource.CreateMediaUpload request;
+
+                using (var stream = new System.IO.FileStream(path, System.IO.FileMode.Open))
+                {
+                    request = service.Files.Create(FileMetaData, stream, FileMetaData.MimeType);
+                    request.Fields = "id";
+                    request.Upload();
+                }
+                Console.WriteLine("File ID: " + request.ResponseBody.Id);
+            }
+        }
+
+        public string DownloadGoogleFile(string fileId)
+        {
+            DriveService service = GetService();
+
+            string FolderPath = System.Web.HttpContext.Current.Server.MapPath("/GoogleDriveFiles/");
+
+            FilesResource.GetRequest FileRequest = service.Files.Get(fileId);
+
+            string FileName = FileRequest.Execute().Name;
+            string FilePath = System.IO.Path.Combine(FolderPath, FileName);
+
+            MemoryStream stream1 = new MemoryStream();
+
+            // Convert Google Document to Word Document
+            FilesResource.ExportRequest request = service.Files.Export(fileId, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
+            // Add a handler which will be notified on progress changes.
+            // It will notify on each chunk download and when the
+            // download is completed or failed.
+            request.MediaDownloader.ProgressChanged += (Google.Apis.Download.IDownloadProgress progress) =>
+            {
+                switch (progress.Status)
+                {
+                    case DownloadStatus.Downloading:
+                        {
+                            Console.WriteLine(progress.BytesDownloaded);
+                            break;
+                        }
+                    case DownloadStatus.Completed:
+                        {
+                            Console.WriteLine("Download complete.");
+                            SaveStream(stream1, FilePath);
+                            break;
+                        }
+                    case DownloadStatus.Failed:
+                        {
+                            Console.WriteLine("Download failed.");
+                            break;
+                        }
+                }
+            };
+            request.Download(stream1);
+            return FilePath;
+        }
+
+        //Delete file from the Google drive
+        public void DeleteFile(string id)
+        {
+            DriveService service = GetService();
+            try
+            {
+                // Initial validation.
+                if (service == null)
+                    throw new ArgumentNullException("service");
+
+                if (id == null)
+                    throw new ArgumentNullException(id);
+
+                // Make the request.
+                service.Files.Delete(id).Execute();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Request Files.Delete failed.", ex);
+            }
+        }
+
+        // file save to server path
+        private static void SaveStream(MemoryStream stream, string FilePath)
+        {
+            using (System.IO.FileStream file = new FileStream(FilePath, FileMode.Create, FileAccess.ReadWrite))
+            {
+                stream.WriteTo(file);
+            }
+        }
     }
 }
