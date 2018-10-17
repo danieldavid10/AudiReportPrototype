@@ -12,12 +12,15 @@
                 <th>
                     Title
                 </th>
-                <th>
-                    Mapping in word document
+                <th style="text-align:center">
+                    Issues
                 </th>
-                <th>
-                    Edit in Google Doc
+                <th style="text-align:center">
+                    Mapping in Word Document
                 </th>
+                @*<th>
+                        Edit in Google Doc
+                    </th>*@
             </tr>
         </thead>
         <tbody>
@@ -27,8 +30,9 @@
                 {
                     <tr>
                         <td>@item.Title</td>
-                        <td><button class="btn btn-sm btn-success">Subir</button></td>
-                        <td><a href="/Home/EditDocumentInGoogleDocs/@item.AuditId" class="btn btn-sm btn-primary">Editar</a></td>
+                        <td style="text-align:center">@item.Issues.Count</td>
+                        @*<td><button class="btn btn-sm btn-success">Subir</button></td>*@
+                        <td style="text-align:center"><a href="/Home/EditDocumentInGoogleDocs/@item.AuditId" class="btn btn-sm btn-primary">Mapping Data</a></td>
                     </tr>
                 }
             }

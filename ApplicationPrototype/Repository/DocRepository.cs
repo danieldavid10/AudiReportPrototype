@@ -34,28 +34,37 @@ namespace ApplicationPrototype.Models
             Section section = document.AddSection();
 
             #region Test Insert HTML code
-            //section.AddParagraph().AppendHTML("<ol><li id='1'>Version 1</li><li>Version 2</li><li>Version 3</li></ol>");
+            //section.AddParagraph().AppendHTML("<ol><li id='1'><b>Version 1</b></li><li>Version 2</li><li>Version 3</li></ol>");
             #endregion
             //----------------------- TITLE --------------------
             // Add new paragraph
             Paragraph pTitle = section.AddParagraph();
             // Add Title
-            pTitle.AppendText(audit.Title);
+            pTitle.AppendHTML("<b>" + audit.Title + "</b>");
+            //pTitle.AppendText(audit.Title);
             pTitle.Format.HorizontalAlignment = HorizontalAlignment.Center;
+            pTitle.Format.AfterSpacing = 10;
 
             //----------------------- ISSUES --------------------
-            Paragraph pIssueTitle = section.AddParagraph();
-            pIssueTitle.AppendText("ISSUES:");
+            int i = 1;
             foreach (var issue in audit.Issues)
             {
+                Paragraph pIssueTitle = section.AddParagraph();
+                pIssueTitle.Format.BeforeSpacing = 10;
+                pIssueTitle.AppendHTML("<b>ISSUE #" + i + "</b>");
+                //pIssueTitle.AppendText("ISSUES:");
+                i++;
                 Paragraph issueTitle = section.AddParagraph();
-                issueTitle.AppendText(issue.Title);
+                issueTitle.AppendHTML("<b>" + issue.Title + "</b>");
+                //issueTitle.AppendText(issue.Title);
                 Paragraph issueDescription = section.AddParagraph();
                 issueDescription.AppendText(issue.Description);
+                issueDescription.Format.AfterSpacing = 10;
 
                 // --------------- RECOMMENDATIONS ----------------
                 Paragraph pRecomTitle = section.AddParagraph();
-                pRecomTitle.AppendText("Recommendations:");
+                pRecomTitle.AppendHTML("<b>Recommendations:</b>");
+                //pRecomTitle.AppendText("Recommendations:");
                 foreach (var re in issue.Recommendations)
                 {
                     Paragraph recomDescription = section.AddParagraph();
@@ -119,34 +128,6 @@ namespace ApplicationPrototype.Models
         //    audit.Issues = issues;
 
         //    return audit;
-        //}
-
-        //private static void generateParagraphList(Section section, List<Issue> issues)
-        //{
-        //    Paragraph paragraph = section.AddParagraph();
-        //    paragraph.AppendText("ISSUES:");
-        //    if (action)
-        //    {
-        //        foreach (var re in audit.Recommendations)
-        //        {
-        //            // Add new paragraphs
-        //            Paragraph p = section.AddParagraph();
-        //            p.AppendText(re.Title + ": " + re.Description);
-        //            p.ListFormat.ApplyBulletStyle();
-        //            p.ListFormat.CurrentListLevel.NumberPosition = -10;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        foreach (var re in audit.Issues)
-        //        {
-        //            // Add new paragraphs
-        //            Paragraph p = section.AddParagraph();
-        //            p.AppendText(re.Title + ": " + re.Description);
-        //            p.ListFormat.ApplyBulletStyle();
-        //            p.ListFormat.CurrentListLevel.NumberPosition = -10;
-        //        }
-        //    }
         //}
     }
 }
