@@ -22,10 +22,10 @@ namespace ApplicationPrototype.Controllers
         }
 
         // GET: api/Audit/GetModify
-        public Audit GetModify()
-        {
-            Audit audit = Repository.GetDataFromDoc();
-            return audit;
-        }
+        //public Audit GetModify()
+        //{
+        //    Audit audit = Repository.GetDataFromDoc();
+        //    return audit;
+        //}
     }
 }

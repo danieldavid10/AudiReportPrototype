@@ -14,5 +14,8 @@ namespace ApplicationPrototype.Models
         public string Title { get; set; }
         [JsonProperty("description")]
         public string Description { get; set; }
+
+        [JsonProperty("recommendations")]
+        public List<Recommendation> Recommendations { get; set; }
     }
 }

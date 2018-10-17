@@ -20,7 +20,7 @@ namespace ApplicationPrototype.Models
             List<Audit> audits;
             using (var client = new HttpClient())
             {
-                var response = await client.GetStringAsync("http://www.mocky.io/v2/5bc0fe85320000700021abcb");
+                var response = await client.GetStringAsync("http://www.mocky.io/v2/5bc74ed73200002c000b07d3");
                 audits = JsonConvert.DeserializeObject<List<Audit>>(response);
             }
             return audits;
@@ -33,6 +33,9 @@ namespace ApplicationPrototype.Models
             // Add Section
             Section section = document.AddSection();
 
+            #region Test Insert HTML code
+            //section.AddParagraph().AppendHTML("<ol><li id='1'>Version 1</li><li>Version 2</li><li>Version 3</li></ol>");
+            #endregion
             //----------------------- TITLE --------------------
             // Add new paragraph
             Paragraph pTitle = section.AddParagraph();
@@ -40,13 +43,27 @@ namespace ApplicationPrototype.Models
             pTitle.AppendText(audit.Title);
             pTitle.Format.HorizontalAlignment = HorizontalAlignment.Center;
 
-            //-------------------- RECOMMENDATIONS --------------  
-            string titleRecommendations = "RECOMENDATIONS:";
-            generateParagraphList(section, titleRecommendations, audit, true);
-
             //----------------------- ISSUES --------------------
-            string titleIssues = "ISSUES:";
-            generateParagraphList(section, titleIssues, audit, false); // optimizate
+            Paragraph pIssueTitle = section.AddParagraph();
+            pIssueTitle.AppendText("ISSUES:");
+            foreach (var issue in audit.Issues)
+            {
+                Paragraph issueTitle = section.AddParagraph();
+                issueTitle.AppendText(issue.Title);
+                Paragraph issueDescription = section.AddParagraph();
+                issueDescription.AppendText(issue.Description);
+
+                // --------------- RECOMMENDATIONS ----------------
+                Paragraph pRecomTitle = section.AddParagraph();
+                pRecomTitle.AppendText("Recommendations:");
+                foreach (var re in issue.Recommendations)
+                {
+                    Paragraph recomDescription = section.AddParagraph();
+                    recomDescription.AppendText(re.Description);
+                    recomDescription.ListFormat.ApplyBulletStyle();
+                    recomDescription.ListFormat.CurrentListLevel.NumberPosition = -10;
+                }
+            }
             // Save Word Document
             string path = pathFiles + audit.Title + ".docx";
             document.SaveToFile(path, FileFormat.Docx2013);
@@ -56,80 +73,80 @@ namespace ApplicationPrototype.Models
             return audit.Title;
         }
 
-        public Audit GetDataFromDoc()
-        {
-            // Cargar un Documento
-            Document document = new Document();
-            document.LoadFromFile(@"D:\WDocuments\WordDocumentGenerated.docx");
+        //public Audit GetDataFromDoc()
+        //{
+        //    // Cargar un Documento
+        //    Document document = new Document();
+        //    document.LoadFromFile(@"D:\WDocuments\WordDocumentGenerated.docx");
 
-            Audit audit = new Audit();
-            List<Recommendation> recommendations = new List<Recommendation>();
-            List<Issue> issues = new List<Issue>();
+        //    Audit audit = new Audit();
+        //    List<Recommendation> recommendations = new List<Recommendation>();
+        //    List<Issue> issues = new List<Issue>();
 
-            var paragraphs = document.Sections[0].Paragraphs;
-            int i = 1;
+        //    var paragraphs = document.Sections[0].Paragraphs;
+        //    int i = 1;
 
-            audit.AuditId = 1;
-            audit.Title = paragraphs[0].Text;
+        //    audit.AuditId = 1;
+        //    audit.Title = paragraphs[0].Text;
 
-            if (paragraphs[i].Text == "RECOMENDATIONS:")
-            {
-                i++;
-                while (paragraphs[i].Text != "ISSUES:")
-                {
-                    Recommendation recom = new Recommendation();
-                    recom.RecommendationId = 1;
-                    recom.Title = "Title of Recomendation";
-                    recom.Description = paragraphs[i].Text;
-                    i++;
+        //    if (paragraphs[i].Text == "RECOMENDATIONS:")
+        //    {
+        //        i++;
+        //        while (paragraphs[i].Text != "ISSUES:")
+        //        {
+        //            Recommendation recom = new Recommendation();
+        //            recom.RecommendationId = 1;
+        //            recom.Title = "Title of Recomendation";
+        //            recom.Description = paragraphs[i].Text;
+        //            i++;
 
-                    recommendations.Add(recom);
-                }
-                i++;
-                while (i < paragraphs.Count)
-                {
-                    Issue issue = new Issue();
-                    issue.IssueId = 1;
-                    issue.Title = "Title of Issue";
-                    issue.Description = paragraphs[i].Text;
-                    i++;
+        //            recommendations.Add(recom);
+        //        }
+        //        i++;
+        //        while (i < paragraphs.Count)
+        //        {
+        //            Issue issue = new Issue();
+        //            issue.IssueId = 1;
+        //            issue.Title = "Title of Issue";
+        //            issue.Description = paragraphs[i].Text;
+        //            i++;
 
-                    issues.Add(issue);
-                }
-            }
+        //            issues.Add(issue);
+        //        }
+        //    }
 
-            audit.Recommendations = recommendations;
-            audit.Issues = issues;
+        //    audit.Recommendations = recommendations;
+        //    audit.Issues = issues;
 
-            return audit;
-        }
+        //    return audit;
+        //}
 
-        private static void generateParagraphList(Section section, string title, Audit audit, bool action)
-        {
-            Paragraph paragraph = section.AddParagraph();
-            paragraph.AppendText(title);
-            if (action)
-            {
-                foreach (var re in audit.Recommendations)
-                {
-                    // Add new paragraphs
-                    Paragraph p = section.AddParagraph();
-                    p.AppendText(re.Title + ": " + re.Description);
-                    p.ListFormat.ApplyBulletStyle();
-                    p.ListFormat.CurrentListLevel.NumberPosition = -10;
-                }
-            }
-            else
-            {
-                foreach (var re in audit.Issues)
-                {
-                    // Add new paragraphs
-                    Paragraph p = section.AddParagraph();
-                    p.AppendText(re.Title + ": " + re.Description);
-                    p.ListFormat.ApplyBulletStyle();
-                    p.ListFormat.CurrentListLevel.NumberPosition = -10;
-                }
-            }
-        }
+        //private static void generateParagraphList(Section section, List<Issue> issues)
+        //{
+        //    Paragraph paragraph = section.AddParagraph();
+        //    paragraph.AppendText("ISSUES:");
+        //    if (action)
+        //    {
+        //        foreach (var re in audit.Recommendations)
+        //        {
+        //            // Add new paragraphs
+        //            Paragraph p = section.AddParagraph();
+        //            p.AppendText(re.Title + ": " + re.Description);
+        //            p.ListFormat.ApplyBulletStyle();
+        //            p.ListFormat.CurrentListLevel.NumberPosition = -10;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        foreach (var re in audit.Issues)
+        //        {
+        //            // Add new paragraphs
+        //            Paragraph p = section.AddParagraph();
+        //            p.AppendText(re.Title + ": " + re.Description);
+        //            p.ListFormat.ApplyBulletStyle();
+        //            p.ListFormat.CurrentListLevel.NumberPosition = -10;
+        //        }
+        //    }
+        //}
     }
 }
