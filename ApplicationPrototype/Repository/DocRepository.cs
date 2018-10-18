@@ -20,7 +20,7 @@ namespace ApplicationPrototype.Models
             List<Audit> audits;
             using (var client = new HttpClient())
             {
-                var response = await client.GetStringAsync("http://www.mocky.io/v2/5bc74ed73200002c000b07d3");
+                var response = await client.GetStringAsync("http://www.mocky.io/v2/5bc8f32032000029005a019c"); // Mock Data
                 audits = JsonConvert.DeserializeObject<List<Audit>>(response);
             }
             return audits;
@@ -30,47 +30,43 @@ namespace ApplicationPrototype.Models
         {
             // New Document
             Document document = new Document();
-            // Add Section
-            Section section = document.AddSection();
 
-            #region Test Insert HTML code
-            //section.AddParagraph().AppendHTML("<ol><li id='1'><b>Version 1</b></li><li>Version 2</li><li>Version 3</li></ol>");
-            #endregion
+            document.LoadFromFile(HttpContext.Current.Server.MapPath("~/Files/DocumentTemplate.docx"));
+            // Add Section
+            Section section = document.Sections[0];
+
             //----------------------- TITLE --------------------
-            // Add new paragraph
-            Paragraph pTitle = section.AddParagraph();
+            Paragraph pTitle = section.Paragraphs[0];
             // Add Title
-            pTitle.AppendHTML("<b>" + audit.Title + "</b>");
-            //pTitle.AppendText(audit.Title);
+            pTitle.AppendText(audit.Title);
+            pTitle.ApplyStyle(BuiltinStyle.Title);
             pTitle.Format.HorizontalAlignment = HorizontalAlignment.Center;
-            pTitle.Format.AfterSpacing = 10;
 
             //----------------------- ISSUES --------------------
             int i = 1;
             foreach (var issue in audit.Issues)
             {
                 Paragraph pIssueTitle = section.AddParagraph();
-                pIssueTitle.Format.BeforeSpacing = 10;
-                pIssueTitle.AppendHTML("<b>ISSUE #" + i + "</b>");
-                //pIssueTitle.AppendText("ISSUES:");
+                pIssueTitle.AppendText("ISSUE " + i);
+                pIssueTitle.ApplyStyle(BuiltinStyle.Heading1);
                 i++;
+
                 Paragraph issueTitle = section.AddParagraph();
-                issueTitle.AppendHTML("<b>" + issue.Title + "</b>");
-                //issueTitle.AppendText(issue.Title);
+                issueTitle.AppendText(issue.Title);
+                issueTitle.ApplyStyle(BuiltinStyle.Heading2);
+
                 Paragraph issueDescription = section.AddParagraph();
                 issueDescription.AppendText(issue.Description);
-                issueDescription.Format.AfterSpacing = 10;
 
                 // --------------- RECOMMENDATIONS ----------------
                 Paragraph pRecomTitle = section.AddParagraph();
-                pRecomTitle.AppendHTML("<b>Recommendations:</b>");
-                //pRecomTitle.AppendText("Recommendations:");
+                pRecomTitle.AppendText("Recommendations:");
+                pRecomTitle.ApplyStyle(BuiltinStyle.Heading3);
                 foreach (var re in issue.Recommendations)
                 {
                     Paragraph recomDescription = section.AddParagraph();
                     recomDescription.AppendText(re.Description);
                     recomDescription.ListFormat.ApplyBulletStyle();
-                    recomDescription.ListFormat.CurrentListLevel.NumberPosition = -10;
                 }
             }
             // Save Word Document
