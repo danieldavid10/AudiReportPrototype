@@ -1,4 +1,5 @@
 ﻿using ApplicationPrototype.Models;
+using ApplicationPrototype.Repository;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -12,20 +13,21 @@ namespace ApplicationPrototype.Controllers
 {
     public class AuditController : ApiController
     {
-        DocRepository Repository = new DocRepository();
+        //DocRepository Repository = new DocRepository();
+        AuditRepository auditRepository = new AuditRepository();
 
         // GET: api/Audit
-        public async Task<List<Audit>> GetAudits()
+        public async Task<IEnumerable<Audit>> GetAudits()
         {
-            List<Audit> audits = await Repository.GetAudits();
+            var audits = await auditRepository.GetAudits();
             return audits;
         }
 
-        // GET: api/Audit/GetModify
-        //public Audit GetModify()
-        //{
-        //    Audit audit = Repository.GetDataFromDoc();
-        //    return audit;
-        //}
+        // GET: api/Audit/GetAudit/{id}
+        public Audit GetAudit(int id)
+        {
+            var audit = auditRepository.FindAuditById(id);
+            return audit;
+        }
     }
 }

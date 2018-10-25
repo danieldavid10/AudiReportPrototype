@@ -1,5 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using ApplicationPrototype.DataContext;
+using ApplicationPrototype.Repository;
+using Newtonsoft.Json;
 using Spire.Doc;
+using Spire.Doc.Collections;
 using Spire.Doc.Documents;
 using System;
 using System.Collections.Generic;
@@ -13,18 +16,22 @@ namespace ApplicationPrototype.Models
 {
     public class DocRepository
     {
-        string pathFiles = @"D:\WDocuments\";
+        AuditRepository auditRepository = new AuditRepository();
 
-        public async Task<List<Audit>> GetAudits()
-        {
-            List<Audit> audits;
-            using (var client = new HttpClient())
-            {
-                var response = await client.GetStringAsync("http://www.mocky.io/v2/5bc8f32032000029005a019c"); // Mock Data
-                audits = JsonConvert.DeserializeObject<List<Audit>>(response);
-            }
-            return audits;
-        }
+        //public async Task<List<Audit>> GetAudits()
+        //{
+        //    List<Audit> audits;
+
+        //    #region Json Deserialize
+        //    using (var client = new HttpClient())
+        //    {
+        //        var response = await client.GetStringAsync("http://www.mocky.io/v2/5bc8f32032000029005a019c"); // Mock Data
+        //        audits = JsonConvert.DeserializeObject<List<Audit>>(response);
+        //    }
+        //    #endregion
+
+        //    return audits;
+        //}
 
         public string GenerateDocument(Audit audit)
         {
@@ -70,60 +77,101 @@ namespace ApplicationPrototype.Models
                 }
             }
             // Save Word Document
-            string path = pathFiles + audit.Title + ".docx";
+            string path = HttpContext.Current.Server.MapPath("~/Files/" + audit.Title + ".docx");
             document.SaveToFile(path, FileFormat.Docx2013);
             // Open Document
-            Process.Start(path);
+            //Process.Start(path);
 
             return audit.Title;
         }
 
-        //public Audit GetDataFromDoc()
-        //{
-        //    // Cargar un Documento
-        //    Document document = new Document();
-        //    document.LoadFromFile(@"D:\WDocuments\WordDocumentGenerated.docx");
+        public void UpdateFileChanges(Audit audit)
+        {
+            Document document = new Document();
+            string FilePath = HttpContext.Current.Server.MapPath("~/Files/");
 
-        //    Audit audit = new Audit();
-        //    List<Recommendation> recommendations = new List<Recommendation>();
-        //    List<Issue> issues = new List<Issue>();
+            document.LoadFromFile(FilePath + audit.Title + ".docx");
+            RemoveEmptyParagraphs(document.Sections);
+            var paragraphs = document.Sections[0].Paragraphs;
+            int i = 0; // paragraph pointer
 
-        //    var paragraphs = document.Sections[0].Paragraphs;
-        //    int i = 1;
+            if (paragraphs[i].StyleName == "Title")
+            {
+                audit.Title = paragraphs[i].Text;
+                i++;
+            }
 
-        //    audit.AuditId = 1;
-        //    audit.Title = paragraphs[0].Text;
+            foreach (var issue in audit.Issues)
+            {
+                do
+                {
+                    i++;
 
-        //    if (paragraphs[i].Text == "RECOMENDATIONS:")
-        //    {
-        //        i++;
-        //        while (paragraphs[i].Text != "ISSUES:")
-        //        {
-        //            Recommendation recom = new Recommendation();
-        //            recom.RecommendationId = 1;
-        //            recom.Title = "Title of Recomendation";
-        //            recom.Description = paragraphs[i].Text;
-        //            i++;
+                    if (paragraphs[i].StyleName == "Heading2")
+                    {
+                        issue.Title = paragraphs[i].Text;
+                        i++;
+                        string description = "";
+                        do
+                        {
+                            description += paragraphs[i].Text + " ";
+                            i++;
+                        } while (paragraphs[i].StyleName == "Normal");
+                        issue.Description = description;
+                    }
 
-        //            recommendations.Add(recom);
-        //        }
-        //        i++;
-        //        while (i < paragraphs.Count)
-        //        {
-        //            Issue issue = new Issue();
-        //            issue.IssueId = 1;
-        //            issue.Title = "Title of Issue";
-        //            issue.Description = paragraphs[i].Text;
-        //            i++;
+                    if (paragraphs[i].StyleName == "Heading3")
+                    {
+                        i++;
+                        foreach (var recom in issue.Recommendations)
+                        {
+                            if (paragraphs[i].StyleName != "Heading1")
+                            {
+                                recom.Description = paragraphs[i].Text;
+                                i++;
+                            }
+                        }
+                        while (i < paragraphs.Count && paragraphs[i].StyleName != "Heading1")
+                        {
+                            Recommendation recommendation = new Recommendation()
+                            {
+                                RecommendationId = 0,
+                                IssueId = issue.IssueId,
+                                Description = paragraphs[i].Text
+                            };
+                            issue.Recommendations.Add(recommendation);
+                            i++;
+                        }
+                    }
 
-        //            issues.Add(issue);
-        //        }
-        //    }
+                } while (i < paragraphs.Count && paragraphs[i].StyleName != "Heading1");
+            }
 
-        //    audit.Recommendations = recommendations;
-        //    audit.Issues = issues;
 
-        //    return audit;
-        //}
+
+            var data = audit;
+
+            Console.WriteLine(data);
+
+            auditRepository.UpdateAudit(audit);
+        }
+
+        private void RemoveEmptyParagraphs(SectionCollection sections)
+        {
+            foreach (Section section in sections)
+            {
+                for (int i = 0; i < section.Body.ChildObjects.Count; i++)
+                {
+                    if (section.Body.ChildObjects[i].DocumentObjectType == DocumentObjectType.Paragraph)
+                    {
+                        if (String.IsNullOrEmpty((section.Body.ChildObjects[i] as Paragraph).Text.Trim()))
+                        {
+                            section.Body.ChildObjects.Remove(section.Body.ChildObjects[i]);
+                            i--;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

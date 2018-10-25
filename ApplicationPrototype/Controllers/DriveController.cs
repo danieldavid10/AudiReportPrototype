@@ -19,12 +19,12 @@ namespace ApplicationPrototype.Controllers
             return View(files);
         }
 
-        [HttpPost]
-        public ActionResult UploadFile(HttpPostedFileBase file)
-        {
-            driveRepository.FileUpload(file);
-            return RedirectToAction("Index");
-        }
+        //[HttpPost]
+        //public ActionResult UploadFile(HttpPostedFileBase file)
+        //{
+        //    driveRepository.FileUpload(file);
+        //    return RedirectToAction("Index");
+        //}
 
         [HttpGet]
         public void DownloadFile(string id)

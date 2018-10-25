@@ -44,6 +44,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Google.Apis, Version=1.36.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Apis.1.36.0\lib\net45\Google.Apis.dll</HintPath>
     </Reference>
@@ -150,11 +156,22 @@
     <Compile Include="Controllers\AuditController.cs" />
     <Compile Include="Controllers\DriveController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="DataContext\AudiReportContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201810221848192_FirstMigration.cs" />
+    <Compile Include="Migrations\201810221848192_FirstMigration.Designer.cs">
+      <DependentUpon>201810221848192_FirstMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201810241237014_Addforeignkey.cs" />
+    <Compile Include="Migrations\201810241237014_Addforeignkey.Designer.cs">
+      <DependentUpon>201810241237014_Addforeignkey.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Audit.cs" />
     <Compile Include="Models\GoogleDriveFiles.cs" />
+    <Compile Include="Repository\AuditRepository.cs" />
     <Compile Include="Repository\DocRepository.cs" />
     <Compile Include="Repository\DriveRepository.cs" />
     <Compile Include="Models\Issue.cs" />
@@ -181,6 +198,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201810221848192_FirstMigration.resx">
+      <DependentUpon>201810221848192_FirstMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201810241237014_Addforeignkey.resx">
+      <DependentUpon>201810241237014_Addforeignkey.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
