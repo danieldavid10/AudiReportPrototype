@@ -35,7 +35,7 @@ namespace ApplicationPrototype.Controllers
             Audit audit = driveRepository.FindById(id);
             string documentId = driveRepository.GetGoogleDocument(audit.Title + ".docx"); // Google Docs
             driveRepository.DownloadGoogleDoc(documentId);
-            docRepository.UpdateFileChanges(audit);
+            docRepository.UpdateFileChanges(audit, documentId);
             return RedirectToAction("Index");
         }
     }

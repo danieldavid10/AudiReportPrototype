@@ -33,9 +33,13 @@ namespace ApplicationPrototype.Repository
                 // Update or add Issues
                 AddOrUpdateIssue(model.AuditId, audit, Context);
                 // Update or add Recommendations
+
                 foreach (Issue issue in audit.Issues)
                 {
-                    AddOrUpdateRecommendation(issue.Recommendations, issue.IssueId, Context);
+                    if (issue.Recommendations != null)
+                    {
+                        AddOrUpdateRecommendation(issue.Recommendations, issue.IssueId, Context);
+                    }
                 }
             }
         }

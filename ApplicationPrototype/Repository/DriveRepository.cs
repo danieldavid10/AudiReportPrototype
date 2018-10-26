@@ -138,6 +138,35 @@ namespace ApplicationPrototype.Models
             return FileList;
         }
 
+        public void FileUpload(HttpPostedFileBase file)
+        {
+            if (file != null && file.ContentLength > 0)
+            {
+                DriveService service = GetService();
+                string folderID = "1RKjoybSiXZlSMlE-vINZ-y2rd9QNU9A4";
+
+                string path = Path.Combine(HttpContext.Current.Server.MapPath("~/GoogleDriveFiles"),
+                Path.GetFileName(file.FileName));
+                file.SaveAs(path);
+
+
+                var FileMetaData = new Google.Apis.Drive.v3.Data.File();
+                FileMetaData.Name = Path.GetFileName(file.FileName);
+                //FileMetaData.MimeType = MimeMapping.GetMimeMapping(path); // Uploading any file
+                FileMetaData.MimeType = "application/vnd.google-apps.document"; // Upload as Google Document
+                FileMetaData.Parents = new List<string> { folderID };
+
+                FilesResource.CreateMediaUpload request;
+                using (var stream = new System.IO.FileStream(path, System.IO.FileMode.Open))
+                {
+                    request = service.Files.Create(FileMetaData, stream, FileMetaData.MimeType);
+                    request.Fields = "id";
+                    request.Upload();
+                }
+                Console.WriteLine("File ID: " + request.ResponseBody.Id);
+            }
+        }
+
         public string FileUpload(string FileName)
         {
             if (FileName != null && FileName.Length > 0)
