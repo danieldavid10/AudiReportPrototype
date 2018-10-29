@@ -119,9 +119,10 @@ namespace ApplicationPrototype.Models
                             string description = "";
                             do
                             {
-                                description += paragraphs[i].Text + " ";
+                                description += paragraphs[i].Text + "\n";
                                 i++;
                             } while (i < paragraphs.Count && paragraphs[i].StyleName == "Normal");
+                            description = description.TrimEnd('\n');
                             issue.Description = description;
                         }
 
@@ -169,10 +170,12 @@ namespace ApplicationPrototype.Models
                         string description = "";
                         while (i < paragraphs.Count && paragraphs[i].StyleName == "Normal")
                         {
-                            description += paragraphs[i].Text + " ";
+                            description += paragraphs[i].Text + "\n";
                             i++;
                         }
+                        description = description.TrimEnd('\n');
                         issue.Description = description;
+                        issue.Recommendations = new List<Recommendation>();
                         audit.Issues.Add(issue);
 
                         auditRepository.UpdateAudit(audit);

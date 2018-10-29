@@ -17,8 +17,6 @@ namespace ApplicationPrototype.Models
 {
     public class DriveRepository
     {
-        // Folder of Files
-        string pathFiles = @"D:\WDocuments\";
         // Defined scope.
         public static string[] Scopes = new string[] { DriveService.Scope.Drive, DriveService.Scope.DriveFile };
 
