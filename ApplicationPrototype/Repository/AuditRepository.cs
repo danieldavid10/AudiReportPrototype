@@ -69,11 +69,23 @@ namespace ApplicationPrototype.Repository
                 {
                     CreateIssue(issue, context);
                 }
-                else
+                else if (issue.Title != "{delete}")
                 {
                     UpdateIssue(issue, context);
                 }
+                else
+                {
+                    DeleteIssue(issue.IssueId,context);
+                }
             }
+        }
+
+        private void DeleteIssue(int issueId, AudiReportContext context)
+        {
+            var issue = context.Issues.Where(x => x.IssueId == issueId).FirstOrDefault();
+            context.Issues.Attach(issue);
+            context.Issues.Remove(issue);
+            context.SaveChanges();
         }
 
         private void CreateIssue(Issue issue, AudiReportContext context)

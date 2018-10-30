@@ -172,7 +172,6 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Audit.cs" />
     <Compile Include="Models\GoogleDriveFiles.cs" />
-    <Compile Include="Repository\AppsScriptRepository.cs" />
     <Compile Include="Repository\AuditRepository.cs" />
     <Compile Include="Repository\DocRepository.cs" />
     <Compile Include="Repository\DriveRepository.cs" />

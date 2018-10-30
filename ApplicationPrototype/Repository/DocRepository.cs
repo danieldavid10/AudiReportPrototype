@@ -85,113 +85,150 @@ namespace ApplicationPrototype.Models
             return audit.Title;
         }
 
-        public void UpdateFileChanges(Audit audit, string docId)
+        public string UpdateFileChanges(Audit audit, string docId)
         {
             Document document = new Document();
             string FilePath = HttpContext.Current.Server.MapPath("~/Files/");
-
+            string message = "";
             document.LoadFromFile(FilePath + audit.Title + ".docx");
             RemoveEmptyParagraphs(document.Sections);
             var paragraphs = document.Sections[0].Paragraphs;
             bool repeat;
-            int i;
-            do
+            int i, fI;
+            try
             {
-                repeat = false;
-                i = 0; // paragraph pointer
-
-                if (paragraphs[i].StyleName == "Title")
+                do
                 {
-                    audit.Title = paragraphs[i].Text;
-                    i++;
-                }
+                    repeat = false;
+                    i = 0; // paragraph pointer
 
-                foreach (var issue in audit.Issues)
-                {
-                    do
+                    if (paragraphs[i].StyleName == "Title")
+                    {
+                        // Update Title
+                        audit.Title = paragraphs[i].Text;
+                        i++;
+                    }
+                    fI = 0;
+                    foreach (var issue in audit.Issues)
+                    {
+                        do
+                        {
+                            i++;
+                            //---------- ISSUES ----------------
+                            if (i < paragraphs.Count && paragraphs[i].StyleName == "Heading2")
+                            {
+                                string txt = "";
+                                if (fI + 1 < audit.Issues.Count)
+                                {
+                                    txt = audit.Issues[fI + 1].Title;
+                                }
+
+                                if (issue.Title == paragraphs[i].Text || paragraphs[i].Text != txt)
+                                {
+                                    // Update Issue
+                                    issue.Title = paragraphs[i].Text;
+                                    i++;
+                                    string description = "";
+                                    do
+                                    {
+                                        description += paragraphs[i].Text + "\n";
+                                        i++;
+                                    } while (i < paragraphs.Count && paragraphs[i].StyleName == "Normal");
+                                    description = description.TrimEnd('\n');
+                                    issue.Description = description;
+                                }
+                                else if (paragraphs[i].Text == audit.Issues[fI + 1].Title)
+                                {
+                                    // Delete Issue
+                                    issue.Title = "{delete}";
+                                    issue.Recommendations = null;
+                                    i--;
+                                    break;
+                                }
+                            }
+                            //---------- RECOMMENDATIONS ----------------
+                            if (i < paragraphs.Count && paragraphs[i].StyleName == "Heading3")
+                            {
+                                i++;
+                                if (issue.Recommendations != null)
+                                {
+                                    // Update Recommendation
+                                    foreach (var recom in issue.Recommendations)
+                                    {
+                                        if (i < paragraphs.Count && paragraphs[i].StyleName == "Normal")
+                                        {
+                                            recom.Description = paragraphs[i].Text;
+                                            i++;
+                                        }
+                                        else
+                                        {
+                                            recom.Description = "{delete}";
+                                        }
+                                    }
+                                }
+                                while (i < paragraphs.Count && paragraphs[i].StyleName != "Heading1")
+                                {
+                                    // Insert Recommendation
+                                    Recommendation recommendation = new Recommendation()
+                                    {
+                                        RecommendationId = 0,
+                                        IssueId = issue.IssueId,
+                                        Description = paragraphs[i].Text
+                                    };
+                                    issue.Recommendations.Add(recommendation);
+                                    i++;
+                                }
+                            }
+
+                        } while (i < paragraphs.Count && paragraphs[i].StyleName != "Heading1");
+
+                        fI++;
+                    }
+
+                    if (i < paragraphs.Count && paragraphs[i].StyleName == "Heading1")
                     {
                         i++;
 
                         if (i < paragraphs.Count && paragraphs[i].StyleName == "Heading2")
                         {
+                            // Insert Issue
+                            Issue issue = new Issue();
+                            issue.AuditId = audit.AuditId;
+                            issue.IssueId = 0;
                             issue.Title = paragraphs[i].Text;
                             i++;
                             string description = "";
-                            do
+                            while (i < paragraphs.Count && paragraphs[i].StyleName == "Normal")
                             {
                                 description += paragraphs[i].Text + "\n";
                                 i++;
-                            } while (i < paragraphs.Count && paragraphs[i].StyleName == "Normal");
+                            }
                             description = description.TrimEnd('\n');
                             issue.Description = description;
+                            issue.Recommendations = new List<Recommendation>();
+                            audit.Issues.Add(issue);
+
+                            auditRepository.UpdateAudit(audit);
+                            DriveRepository driveRepository = new DriveRepository();
+                            driveRepository.DownloadGoogleDoc(docId);
+                            repeat = true;
                         }
-
-                        if (i < paragraphs.Count && paragraphs[i].StyleName == "Heading3")
-                        {
-                            i++;
-                            if (issue.Recommendations != null)
-                            {
-                                foreach (var recom in issue.Recommendations)
-                                {
-                                    if (i < paragraphs.Count && paragraphs[i].StyleName != "Heading1")
-                                    {
-                                        recom.Description = paragraphs[i].Text;
-                                        i++;
-                                    }
-                                }
-                            }
-                            while (i < paragraphs.Count && paragraphs[i].StyleName != "Heading1")
-                            {
-                                Recommendation recommendation = new Recommendation()
-                                {
-                                    RecommendationId = 0,
-                                    IssueId = issue.IssueId,
-                                    Description = paragraphs[i].Text
-                                };
-                                issue.Recommendations.Add(recommendation);
-                                i++;
-                            }
-                        }
-
-                    } while (i < paragraphs.Count && paragraphs[i].StyleName != "Heading1");
-                }
-
-                if (i < paragraphs.Count && paragraphs[i].StyleName == "Heading1")
-                {
-                    i++;
-
-                    if (i < paragraphs.Count && paragraphs[i].StyleName == "Heading2")
-                    {
-                        Issue issue = new Issue();
-                        issue.AuditId = audit.AuditId;
-                        issue.IssueId = 0;
-                        issue.Title = paragraphs[i].Text;
-                        i++;
-                        string description = "";
-                        while (i < paragraphs.Count && paragraphs[i].StyleName == "Normal")
-                        {
-                            description += paragraphs[i].Text + "\n";
-                            i++;
-                        }
-                        description = description.TrimEnd('\n');
-                        issue.Description = description;
-                        issue.Recommendations = new List<Recommendation>();
-                        audit.Issues.Add(issue);
-
-                        auditRepository.UpdateAudit(audit);
-                        DriveRepository driveRepository = new DriveRepository();
-                        driveRepository.DownloadGoogleDoc(docId);
-                        repeat = true;
                     }
-                }
 
-            } while (repeat);
+                } while (repeat);
 
-            var data = audit;
-
-            Console.WriteLine(data);
-
-            auditRepository.UpdateAudit(audit);
+                message = "Success";
+            }
+            catch (Exception)
+            {
+                message = "Error";
+                //throw;
+            }
+            if (message != "Error")
+            {
+                auditRepository.UpdateAudit(audit);
+            }
+            return message;
         }
 
         private void RemoveEmptyParagraphs(SectionCollection sections)

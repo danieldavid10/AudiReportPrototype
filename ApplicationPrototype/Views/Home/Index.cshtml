@@ -19,7 +19,7 @@
                     Issues
                 </th>
                 <th style="text-align:center">
-                    Mapping in Word Document
+                    Mapping in Google Document
                 </th>
                 <th>
                     Update Document
@@ -35,7 +35,7 @@
                         <td>@item.AuditId</td>
                         <td>@item.Title</td>
                         <td style="text-align:center">@item.Issues.Count</td>
-                        <td style="text-align:center"><a href="/Home/EditDocumentInGoogleDocs/@item.AuditId" class="btn btn-sm btn-primary">Mapping Data</a></td>
+                        <td style="text-align:center"><a href="/Home/EditDocumentInGoogleDocs/@item.AuditId" class="btn btn-sm btn-primary">Open Document</a></td>
                         <td style="text-align:center"><a href="/Home/UpdateFileData/@item.AuditId" class="btn btn-sm btn-success">Update</a></td>
                     </tr>
                 }
@@ -49,3 +49,18 @@
         </tbody>
     </table>
 </div>
+<hr />
+@if (ViewBag.Message == "Success")
+{
+    <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <strong>Success</strong> All changes in the document have been updated.
+    </div>
+}
+@if (ViewBag.Message == "Error")
+{
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <strong>Invalid document format</strong> The changes are not updated, Correct the document: <a target="_blank" href="https://docs.google.com/document/d/@ViewBag.GoogleDocId/edit">Click here to correct document</a>
+    </div>
+}
