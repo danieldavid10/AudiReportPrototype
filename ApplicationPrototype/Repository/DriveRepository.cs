@@ -27,15 +27,15 @@ namespace ApplicationPrototype.Models
             string path = HttpContext.Current.Server.MapPath("~/Credentials");
             using (var stream = new FileStream(path + "/client_secret.json", FileMode.Open, FileAccess.Read))
             {
-                String FolderPath = @"D:\";
-                String FilePath = Path.Combine(FolderPath, "DriveServiceCredentials.json");
+                String FolderPath = HttpContext.Current.Server.MapPath("~/Credentials");
+                //String FilePath = Path.Combine(FolderPath, "DriveServiceCredentials.json");
 
                 credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
                     Scopes,
                     "user",
                     CancellationToken.None,
-                    new FileDataStore(FilePath, true)).Result;
+                    new FileDataStore(FolderPath, true)).Result;
             }
 
             //create Drive API service.
@@ -46,8 +46,6 @@ namespace ApplicationPrototype.Models
             });
             return service;
         }
-
-        
 
         public List<Audit> LoadAudits()
         {
@@ -71,36 +69,6 @@ namespace ApplicationPrototype.Models
             }
             return null;
         }
-
-        //public void UploadFile(string name)
-        //{
-        //    DriveService service = GetService();
-
-        //    //string path = Path.Combine(HttpContext.Current.Server.MapPath("~/Files"),
-        //    //    Path.GetFileName(name + ".docx"));
-
-        //    string path = pathFiles + name + ".docx";
-
-        //    if (System.IO.File.Exists(path))
-        //    {
-        //        var fileMetadata = new Google.Apis.Drive.v3.Data.File()
-        //        {
-        //            Name = "Damiel David",
-        //            MimeType = "application/vnd.google-apps.document"
-        //        };
-
-        //        FilesResource.CreateMediaUpload request;
-
-        //        using (var stream = new System.IO.FileStream(path, System.IO.FileMode.Open))
-        //        {
-        //            request = service.Files.Create(fileMetadata, stream, fileMetadata.MimeType);
-        //            request.Fields = "id";
-        //            request.Upload();
-        //        }
-        //        var file = request.ResponseBody;
-        //        Console.WriteLine("File ID: " + file.Id);
-        //    }
-        //}
 
         public List<GoogleDriveFiles> getFilesInFolder()
         {
