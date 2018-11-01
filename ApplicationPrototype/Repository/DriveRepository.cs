@@ -1,4 +1,5 @@
-﻿using Google.Apis.Auth.OAuth2;
+﻿using ApplicationPrototype.Repository;
+using Google.Apis.Auth.OAuth2;
 using Google.Apis.Download;
 using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
@@ -17,6 +18,8 @@ namespace ApplicationPrototype.Models
 {
     public class DriveRepository
     {
+        AuditRepository auditRepository = new AuditRepository();
+
         // Defined scope.
         public static string[] Scopes = new string[] { DriveService.Scope.Drive, DriveService.Scope.DriveFile };
 
@@ -49,13 +52,13 @@ namespace ApplicationPrototype.Models
 
         public List<Audit> LoadAudits()
         {
-            List<Audit> audits;
-            using (var client = new HttpClient())
-            {
-                var response = client.GetStringAsync("http://localhost:59449/api/Audit/GetAudits").Result;
-                audits = JsonConvert.DeserializeObject<List<Audit>>(response);
-            }
-            return audits;
+            //List<Audit> audits;
+            //using (var client = new HttpClient())
+            //{
+            //    var response = client.GetStringAsync("http://localhost:59449/api/Audit/GetAudits").Result;
+            //    audits = JsonConvert.DeserializeObject<List<Audit>>(response);
+            //}
+            return auditRepository.GetAudits(); ;
         }
 
         public Audit FindById(int id)

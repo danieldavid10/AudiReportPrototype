@@ -13,11 +13,11 @@ namespace ApplicationPrototype.Repository
     {
         private AudiReportContext Context;
 
-        public async Task<IEnumerable<Audit>> GetAudits()
+        public List<Audit> GetAudits()
         {
             using (Context = new AudiReportContext())
             {
-                var audits = await Context.Audits.Include("Issues").Include("Issues.Recommendations").ToListAsync();
+                var audits = Context.Audits.Include("Issues").Include("Issues.Recommendations").ToList();
                 return audits;
             }
         }

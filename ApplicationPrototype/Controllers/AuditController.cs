@@ -17,9 +17,9 @@ namespace ApplicationPrototype.Controllers
         AuditRepository auditRepository = new AuditRepository();
 
         // GET: api/Audit
-        public async Task<IEnumerable<Audit>> GetAudits()
+        public List<Audit> GetAudits()
         {
-            var audits = await auditRepository.GetAudits();
+            var audits = auditRepository.GetAudits();
             return audits;
         }
 

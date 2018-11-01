@@ -144,6 +144,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Credentials\client_secret.json" />
     <Content Include="Files\DocumentTemplate.docx" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
