@@ -75,7 +75,7 @@ namespace ApplicationPrototype.Models
             Document document = new Document();
             string FilePath = HttpContext.Current.Server.MapPath("~/Files/");
             string message = "";
-            document.LoadFromFile(FilePath + audit.Title + ".docx");
+            document.LoadFromFile(FilePath + docId + ".docx");
             RemoveEmptyParagraphs(document.Sections);
             var paragraphs = document.Sections[0].Paragraphs;
             bool repeat;

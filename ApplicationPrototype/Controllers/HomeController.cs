@@ -37,11 +37,11 @@ namespace ApplicationPrototype.Controllers
         public ActionResult UpdateFileData(int id)
         {
             Audit audit = driveRepository.FindById(id);
-            string documentId = driveRepository.GetGoogleDocument(audit.Title + ".docx"); // Google Docs
-            driveRepository.DownloadGoogleDoc(documentId);
-            string result = docRepository.UpdateFileChanges(audit, documentId);
+            //string documentId = driveRepository.GetGoogleDocument(audit.Title + ".docx"); // Google Docs
+            driveRepository.DownloadGoogleDoc(audit.GoogleDocId);
+            string result = docRepository.UpdateFileChanges(audit, audit.GoogleDocId);
             ViewBag.Message = result;
-            ViewBag.GoogleDocId = documentId;
+            ViewBag.GoogleDocId = audit.GoogleDocId;
             return View("Index",driveRepository.LoadAudits());
         }
     }

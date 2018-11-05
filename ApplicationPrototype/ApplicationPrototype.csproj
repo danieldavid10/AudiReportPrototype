@@ -161,6 +161,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201811051227286_StartDatabase.cs" />
+    <Compile Include="Migrations\201811051227286_StartDatabase.Designer.cs">
+      <DependentUpon>201811051227286_StartDatabase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Audit.cs" />
     <Compile Include="Models\GoogleDriveFiles.cs" />
     <Compile Include="Repository\AuditRepository.cs" />
@@ -190,6 +195,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201811051227286_StartDatabase.resx">
+      <DependentUpon>201811051227286_StartDatabase.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -269,9 +269,9 @@ namespace ApplicationPrototype.Models
             MemoryStream stream = new MemoryStream();
             FilesResource.GetRequest FileRequest = service.Files.Get(fileId);
 
-            string FileName = FileRequest.Execute().Name;
+            //string FileName = FileRequest.Execute().Name;
 
-            string FilePath = HttpContext.Current.Server.MapPath("~/Files/" + FileName);
+            string FilePath = HttpContext.Current.Server.MapPath("~/Files/" + fileId + ".docx");
 
 
             // Convert Google Document to Word Document
