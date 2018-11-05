@@ -129,5 +129,16 @@ namespace ApplicationPrototype.Repository
             Context.Entry(RecommendationModel).State = EntityState.Modified;
             Context.SaveChanges();
         }
+
+        public void UpdateOnlyAudit(int auditId, string docId)
+        {
+            using (Context = new AudiReportContext())
+            {
+                var audit = Context.Audits.Where(x => x.AuditId == auditId).FirstOrDefault();
+                audit.GoogleDocId = docId;
+                Context.Entry(audit).State = EntityState.Modified;
+                Context.SaveChanges();
+            }
+        }
     }
 }

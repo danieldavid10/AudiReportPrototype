@@ -35,7 +35,14 @@
                         <td>@item.AuditId</td>
                         <td>@item.Title</td>
                         <td style="text-align:center">@item.Issues.Count</td>
-                        <td style="text-align:center"><a href="/Home/EditDocumentInGoogleDocs/@item.AuditId" class="btn btn-sm btn-primary">Open Document</a></td>
+                        @if (item.GoogleDocId == null || item.GoogleDocId == "")
+                        {
+                            <td style="text-align:center"><a href="/Home/EditDocumentInGoogleDocs/@item.AuditId" class="btn btn-sm btn-default">Mapping Document</a></td>
+                        }
+                        else
+                        {
+                            <td style="text-align:center"><a href="https://docs.google.com/document/d/@item.GoogleDocId/edit" class="btn btn-sm btn-primary" target="_blank">Open Document</a></td>
+                        }
                         <td style="text-align:center"><a href="/Home/UpdateFileData/@item.AuditId" class="btn btn-sm btn-success">Update</a></td>
                     </tr>
                 }

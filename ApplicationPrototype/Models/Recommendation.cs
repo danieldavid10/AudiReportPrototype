@@ -8,10 +8,15 @@ namespace ApplicationPrototype.Models
 {
     public class Recommendation
     {
-        [JsonProperty("recomendationId")]
         public int RecommendationId { get; set; }
-        [JsonProperty("description")]
         public string Description { get; set; }
         public int IssueId { get; set; }
+
+        public Recommendation()
+        {
+            RecommendationId = 0;
+            Description = "";
+            IssueId = 0;
+        }
     }
 }

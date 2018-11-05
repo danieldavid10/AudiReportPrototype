@@ -52,13 +52,7 @@ namespace ApplicationPrototype.Models
 
         public List<Audit> LoadAudits()
         {
-            //List<Audit> audits;
-            //using (var client = new HttpClient())
-            //{
-            //    var response = client.GetStringAsync("http://localhost:59449/api/Audit/GetAudits").Result;
-            //    audits = JsonConvert.DeserializeObject<List<Audit>>(response);
-            //}
-            return auditRepository.GetAudits(); ;
+            return auditRepository.GetAudits();
         }
 
         public Audit FindById(int id)

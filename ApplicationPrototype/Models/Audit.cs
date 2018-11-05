@@ -8,12 +8,17 @@ namespace ApplicationPrototype.Models
 {
     public class Audit
     {
-        [JsonProperty("auditId")]
         public int AuditId { get; set; }
-        [JsonProperty("title")]
         public string Title { get; set; }
-
-        [JsonProperty("issues")]
+        public string GoogleDocId { get; set; }
         public List<Issue> Issues { get; set; }
+
+        public Audit()
+        {
+            AuditId = 0;
+            Title = "";
+            GoogleDocId = "";
+            Issues = new List<Issue>();
+        }
     }
 }

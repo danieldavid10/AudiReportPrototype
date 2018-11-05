@@ -1,4 +1,5 @@
 ﻿using ApplicationPrototype.Models;
+using ApplicationPrototype.Repository;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +13,7 @@ namespace ApplicationPrototype.Controllers
     {
         DriveRepository driveRepository = new DriveRepository();
         DocRepository docRepository = new DocRepository();
+        AuditRepository auditRepository = new AuditRepository();
 
         // GET: Home
         public ActionResult Index()
@@ -23,9 +25,11 @@ namespace ApplicationPrototype.Controllers
         public ActionResult EditDocumentInGoogleDocs(int id)
         {
             Audit audit = driveRepository.FindById(id);
+
             string documentName = docRepository.GenerateDocument(audit); // Word Dcument
             string documentId = driveRepository.FileUpload(documentName); // Google Docs Document
-            Process.Start("https://docs.google.com/document/d/" + documentId + "/edit"); // Open Document
+            auditRepository.UpdateOnlyAudit(id,documentId);
+            //Process.Start("https://docs.google.com/document/d/" + documentId + "/edit"); // Open Document
             return RedirectToAction("Index");
         }
 

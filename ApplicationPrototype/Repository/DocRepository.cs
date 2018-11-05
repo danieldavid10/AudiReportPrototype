@@ -18,21 +18,6 @@ namespace ApplicationPrototype.Models
     {
         AuditRepository auditRepository = new AuditRepository();
 
-        //public async Task<List<Audit>> GetAudits()
-        //{
-        //    List<Audit> audits;
-
-        //    #region Json Deserialize
-        //    using (var client = new HttpClient())
-        //    {
-        //        var response = await client.GetStringAsync("http://www.mocky.io/v2/5bc8f32032000029005a019c"); // Mock Data
-        //        audits = JsonConvert.DeserializeObject<List<Audit>>(response);
-        //    }
-        //    #endregion
-
-        //    return audits;
-        //}
-
         public string GenerateDocument(Audit audit)
         {
             // New Document
